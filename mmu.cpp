@@ -526,6 +526,17 @@ VMA* check_in_vma_list(Process* p, int vpage){
     return NULL;
 }
 
+void reset_pte(pte_t* pte){
+    pte->present = 0;
+    pte->refrenced = 0;
+    pte->pagedout = 0;
+    pte->modified = 0;
+    pte->frame_num = 0;
+    pte->write_protected = 0;
+    pte->file_mapped = 0;
+
+}
+
 void after_exit(Process* p){
     for(int i = 0; i<MAX_VPAGES ; i++){
         pte_t* pte = &p->page_table[i];
@@ -539,6 +550,7 @@ void after_exit(Process* p){
             f->age_counter = 0;
             f->curr_pid = -1;
             f->curr_ass_vpage = -1;
+            f->time_of_last_use = 0;
             frame_t* f_ptr = &frame_table[fid];
             framefreelist.push(f_ptr);
             if(pte->modified){
@@ -549,6 +561,8 @@ void after_exit(Process* p){
             }
             }
         }
+        reset_pte(pte);
+        CURRENT_PROCESS = NULL;
 
     }
 }
