@@ -297,7 +297,7 @@ Pager* THE_PAGER;
 
 void print_vma_list(Process* p){
     cout << "VMA LIST" << endl;
-    vector<VMA*>::iterator itr = p->vma_list.begin()
+    vector<VMA*>::iterator itr = p->vma_list.begin();
     while( itr != p->vma_list.end()){
         cout << "start_vpage" << (*itr)->start_vpage;
         cout << "end_vpage" << (*itr)->end_vpage;
