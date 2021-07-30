@@ -40,7 +40,7 @@ struct frame_t{
     int fid;
     int curr_pid = -1;
     int curr_ass_vpage;
-    unsigned int age_counter:32;
+    unsigned int age:32;
     int time_of_last_use = 0;
 
 };
@@ -220,13 +220,13 @@ class AGING : public Pager{
         //cout << "hand" << hand << endl;
         frame_t* frame = &frame_table[hand];
         pte_t* pte = &((pro_vector.at(frame->curr_pid))->page_table[frame->curr_ass_vpage]);
-        frame->age_counter = frame->age_counter >> 1;
+        frame->age = frame->age >> 1;
         if(pte->refrenced){
-            frame->age_counter = frame->age_counter | 0x80000000;
+            frame->age = frame->age | 0x80000000;
             pte->refrenced = 0;  
         }
-        //cout << "frame->age_counter" << frame->age_counter << endl;
-        if(victim_frame == NULL || frame->age_counter < victim_frame->age_counter){
+        //cout << "frame->age" << frame->age << endl;
+        if(victim_frame == NULL || frame->age < victim_frame->age){
             victim_frame = frame;
         }
         
@@ -450,14 +450,9 @@ void unmap_victim_frame(frame_t* victim_frame){
     int pro_id = victim_frame->curr_pid;
     pte_t* pte = &((pro_vector.at(pro_id))->page_table[victim_frame->curr_ass_vpage]);
     pte->present = 0;
-    //pte.refrenced = 0;
-    //pte.modified = 0;
     (pro_vector.at(pro_id))->UNMAP = (pro_vector.at(pro_id))->UNMAP + 1;
     cost = cost + 400;
     cout << " UNMAP" << " " <<pro_id << ":" << victim_frame->curr_ass_vpage << endl;
-
-    // if(){
-    // }
 }
 
 frame_t* get_frame(){
@@ -526,16 +521,6 @@ VMA* check_in_vma_list(Process* p, int vpage){
     return NULL;
 }
 
-void reset_pte(pte_t* pte){
-    pte->present = 0;
-    pte->refrenced = 0;
-    pte->pagedout = 0;
-    pte->modified = 0;
-    pte->frame_num = 0;
-    pte->write_protected = 0;
-    pte->file_mapped = 0;
-
-}
 
 void after_exit(Process* p){
     for(int i = 0; i<MAX_VPAGES ; i++){
@@ -547,7 +532,7 @@ void after_exit(Process* p){
             p->UNMAP = p->UNMAP + 1;
             cost = cost + 400;
             cout << " UNMAP" << " " <<p->pid << ":" << f->curr_ass_vpage << endl;
-            f->age_counter = 0;
+            f->age = 0;
             f->curr_pid = -1;
             f->curr_ass_vpage = -1;
             f->time_of_last_use = 0;
@@ -561,7 +546,13 @@ void after_exit(Process* p){
             }
             }
         }
-        reset_pte(pte);
+        pte->present = 0;
+        pte->refrenced = 0;
+        pte->pagedout = 0;
+        pte->modified = 0;
+        pte->frame_num = 0;
+        pte->write_protected = 0;
+        pte->file_mapped = 0;
         CURRENT_PROCESS = NULL;
 
     }
@@ -630,7 +621,7 @@ void simulation(){
                 }
                 newframe->curr_pid = CURRENT_PROCESS->pid;
                 newframe->curr_ass_vpage = vpage;
-                newframe->age_counter = 0;
+                newframe->age = 0;
                 pte->frame_num = newframe->fid;
                 pte->present = 1;
                 CURRENT_PROCESS->MAP = CURRENT_PROCESS->MAP + 1;
@@ -683,13 +674,12 @@ void print_frame_table(){
     printf("FT: ");
     for (int i = 0; i < MAX_FRAMES; i++)
     {
-        if (frame_table[i].curr_pid != -1)
-        {
-            printf("%d:%d ", frame_table[i].curr_pid, frame_table[i].curr_ass_vpage);
+        if (frame_table[i].curr_pid != -1){
+            //printf("%d:%d ", frame_table[i].curr_pid, frame_table[i].curr_ass_vpage);
+            cout << frame_table[i].curr_pid <<":" << frame_table[i].curr_ass_vpage << " ";
         }
-        else
-        {
-            printf("* ");
+        else{
+            cout << "* ";
         }
     }
     printf("\n");
@@ -702,30 +692,41 @@ void print_process_table(){
         Process *proc = pro_vector.at(i);
         printf("PT[%d]: ", proc->pid);
 
-        for (int j = 0; j < 64; j++)
+        for (int i = 0; i < MAX_VPAGES; i++)
         {
             //cout << " ";
-            pte_t *pte = &proc->page_table[j];
+            pte_t *pte = &proc->page_table[i];
             //cout << pte->present << endl;
             if (pte->present)
             {
-                cout << j << ":";
-                if (pte->refrenced)
+                cout << i << ":";
+                if (pte->refrenced){
                     cout << "R";
-                else
+                }
+                else{
                     cout << "-";
-                if (pte->modified)
+                }
+                if (pte->modified){
                     cout << "M";
-                else
+                }
+                else{
                     cout << "-";
-                if (pte->pagedout)
+                }
+                if (pte->pagedout){
                     cout << "S";
-                else
+                }
+                else{
                     cout << "-";
+                }
             }
-            else
-            {
-                cout << (pte->pagedout ? "#" : "*");
+            else{
+                if(pte->pagedout){
+                    cout << "#";
+                }
+                else{
+                    cout << "*";
+                }
+                //cout << (pte->pagedout ? "#" : "*");
             }
             cout << " ";
         }
