@@ -297,7 +297,7 @@ Pager* THE_PAGER;
 
 void print_vma_list(Process* p){
     cout << "VMA LIST" << endl;
-    vector<VMA*>::iterator itr = p->vma_list.begin();
+    vector<VMA*>::iterator itr = p->vma_list.begin()
     while( itr != p->vma_list.end()){
         cout << "start_vpage" << (*itr)->start_vpage;
         cout << "end_vpage" << (*itr)->end_vpage;
@@ -327,6 +327,7 @@ int parseInput(int argc, char *argv[]) {
         nofarg++;
         char temp;
         char algoType;
+        char* OPFS;
         if (flag == 'a') {
             // cout << optarg << endl;
             algoType = optarg[0];
@@ -352,10 +353,13 @@ int parseInput(int argc, char *argv[]) {
             MAX_FRAMES = stoi(optarg);
             
         }
-         else {
-            cout << "Invalid Argument";
-            exit(0);
+        else if(flag == 'o'){
+            OPFS = optarg;
         }
+        //  else {
+        //     cout << "Invalid Argument";
+        //     exit(0);
+        // }
     }
     return nofarg;
     // read the input files
