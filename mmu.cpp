@@ -680,22 +680,19 @@ void simulation(){
 }
 
 void print_frame_table(){
-    printf("FT:");
+    printf("FT: ");
     for (int i = 0; i < MAX_FRAMES; i++)
     {
-        printf(" ");
         if (frame_table[i].curr_pid != -1)
         {
-            printf("%d:%d", frame_table[i].curr_pid, frame_table[i].curr_ass_vpage);
+            printf("%d:%d ", frame_table[i].curr_pid, frame_table[i].curr_ass_vpage);
         }
         else
         {
-            printf("*");
+            printf("* ");
         }
     }
     printf("\n");
-
-
 }
 
 void print_process_table(){
@@ -703,11 +700,11 @@ void print_process_table(){
     {
         // print table
         Process *proc = pro_vector.at(i);
-        printf("PT[%d]:", proc->pid);
+        printf("PT[%d]: ", proc->pid);
 
         for (int j = 0; j < 64; j++)
         {
-            cout << " ";
+            //cout << " ";
             pte_t *pte = &proc->page_table[j];
             //cout << pte->present << endl;
             if (pte->present)
@@ -730,7 +727,9 @@ void print_process_table(){
             {
                 cout << (pte->pagedout ? "#" : "*");
             }
+            cout << " ";
         }
+
         cout << endl;
     }
 }
