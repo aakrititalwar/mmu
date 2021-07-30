@@ -38,7 +38,7 @@ struct VMA{
 
 struct frame_t{
     int fid;
-    int curr_pid;
+    int curr_pid = -1;
     int curr_ass_vpage;
     unsigned int age_counter:32;
     int time_of_last_use = 0;
