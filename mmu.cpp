@@ -415,7 +415,7 @@ void readinpfile(){
         num_process--;
         pro_vector.push_back(p);
     }
-    print_pro_vector();
+    //print_pro_vector();
 }
 
 void init_frame_table_and_list(){
@@ -732,7 +732,7 @@ int main(int argc, char *argv[]){
    rfile = fopen(argv[nofarg+2], "r");
    readinpfile();
    readrfile();
-   cout << "rlinenum"<<rlinenum << endl;
+   //cout << "rlinenum"<<rlinenum << endl;
    init_frame_table_and_list();
    simulation();
    print_process_table();
