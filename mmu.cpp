@@ -541,10 +541,12 @@ void after_exit(Process* p){
             f->curr_ass_vpage = -1;
             frame_t* f_ptr = &frame_table[fid];
             framefreelist.push(f_ptr);
+            if(pte->modified){
             if(pte->file_mapped){
                 p->FOUT = p->FOUT + 1;
                 cost = cost + 2400;
                 cout << " FOUT" <<  endl;
+            }
             }
         }
 
